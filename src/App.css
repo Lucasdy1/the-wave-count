@@ -1,0 +1,275 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #102f2c;
+  color: white;
+  font-family: Inter, system-ui, Arial, sans-serif;
+}
+
+.app {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(67, 160, 135, 0.35), transparent 35%),
+    linear-gradient(135deg, #173f3a, #102f2c);
+}
+
+.ticker {
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.28);
+  padding: 14px 0;
+  color: rgba(255,255,255,.75);
+  font-weight: 700;
+}
+
+.tickerInner {
+  display: flex;
+  gap: 36px;
+  width: max-content;
+  animation: ticker 28s linear infinite;
+}
+
+.ticker em {
+  color: #4ade80;
+  font-style: normal;
+}
+
+.wrap {
+  width: min(1280px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 34px 0 60px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 34px;
+}
+
+h1 {
+  font-size: 44px;
+  margin: 0;
+}
+
+button {
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.08);
+  color: white;
+  border-radius: 999px;
+  padding: 14px 26px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button.active,
+.activeTab {
+  background: #d7f8df;
+  color: #11342f;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.card,
+.panel {
+  background: rgba(255,255,255,.055);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 18px;
+  padding: 28px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 40px rgba(0,0,0,.12);
+}
+
+.card p,
+.panel p {
+  margin: 0 0 12px;
+  color: rgba(255,255,255,.55);
+}
+
+.card strong {
+  display: block;
+  font-size: 38px;
+  color: #4ade80;
+}
+
+.card .white {
+  color: white;
+}
+
+.card span {
+  color: rgba(255,255,255,.42);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-size: 24px;
+}
+
+.empty {
+  margin-top: 34px;
+  border: 1px dashed rgba(255,255,255,.18);
+  border-radius: 18px;
+  padding: 70px;
+  text-align: center;
+  color: rgba(255,255,255,.45);
+}
+
+.panelHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.panelHead b {
+  color: #4ade80;
+}
+
+.chart {
+  margin-top: 32px;
+  height: 260px;
+  border-radius: 16px;
+  background: rgba(0,0,0,.12);
+  overflow: hidden;
+}
+
+.chart svg {
+  width: 100%;
+  height: 100%;
+}
+
+.positions {
+  margin-top: 24px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tabs button {
+  border-radius: 10px;
+  padding: 12px 18px;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  margin-top: 24px;
+}
+
+th {
+  color: rgba(255,255,255,.45);
+  text-align: left;
+  text-transform: uppercase;
+  font-size: 13px;
+  padding: 14px;
+}
+
+td {
+  background: rgba(255,255,255,.045);
+  padding: 18px 14px;
+}
+
+td:first-child {
+  border-radius: 14px 0 0 14px;
+}
+
+td:last-child {
+  border-radius: 0 14px 14px 0;
+}
+
+.emptyRow {
+  text-align: center;
+  color: rgba(255,255,255,.45);
+  padding: 48px;
+  border-radius: 14px !important;
+}
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (max-width: 900px) {
+  .topbar,
+  .panelHead {
+    flex-direction: column;
+  }
+
+  .metrics,
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+}
+.allocationSection {
+  margin-top: 24px;
+}
+
+.allocationPanel {
+  min-height: 360px;
+}
+
+.allocationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.allocationHeader b {
+  color: #4ade80;
+}
+
+.donutWrap {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 36px;
+  align-items: center;
+}
+
+.donutLegend {
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.legendRow {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.legendRow span {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+}
+
+.legendRow em {
+  color: rgba(255,255,255,.55);
+  font-style: normal;
+}
+
+@media (max-width: 800px) {
+  .donutWrap {
+    grid-template-columns: 1fr;
+  }
+}
