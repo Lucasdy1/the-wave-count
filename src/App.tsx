@@ -43,7 +43,7 @@ type FormState = {
   entryDate: string;
 };
 
-const ADMIN_PASSWORD = 'Paul011212!12';
+const ADMIN_PASSWORD = 'Passwort123567!';
 const FINNHUB_API_KEY = import.meta.env.VITE_FINNHUB_API_KEY;
 
 const CRYPTO_SYMBOLS: Record<string, string> = {
