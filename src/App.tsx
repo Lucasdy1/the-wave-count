@@ -97,6 +97,10 @@ function fromDb(row: DbPosition): Position {
     status: row.status,
     current: row.current,
     lastUpdated: row.last_updated,
+
+    weight: row.weight,
+remainingWeight: row.remaining_weight,
+realizedReturn: row.realized_return,
   };
 }
 
@@ -109,6 +113,10 @@ function toDb(position: Omit<Position, 'id'>) {
     status: position.status,
     current: position.current,
     last_updated: position.lastUpdated,
+
+    weight: position.weight,
+remaining_weight: position.remainingWeight,
+realized_return: position.realizedReturn,
   };
 }
 
