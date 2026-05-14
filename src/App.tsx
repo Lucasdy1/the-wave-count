@@ -173,16 +173,27 @@ function groupPositions(positions: Position[], status: 'open' | 'closed'): Group
   const buckets = new Map<string, Position[]>();
 
   positions
-    .filter((p) => p.status === status)
+    .filter((p) => {
+      if (status === 'open') return p.remainingWeight > 0;
+      return p.remainingWeight < p.weight;
+    })
     .forEach((p) => {
-      const key = `${p.asset}-${p.direction}-${p.status}`;
+      const key = `${p.asset}-${p.direction}`;
       const existing = buckets.get(key) ?? [];
       buckets.set(key, [...existing, p]);
     });
 
   return Array.from(buckets.values()).map((entries) => {
     const sorted = [...entries].sort((a, b) => a.entryDate.localeCompare(b.entryDate));
-    const avgEntry = sorted.reduce((sum, p) => sum + p.avgEntry, 0) / sorted.length;
+    const activeEntries = status === 'open'
+      ? sorted.filter((p) => p.remainingWeight > 0)
+      : sorted.filter((p) => p.remainingWeight < p.weight);
+
+    const totalWeight = activeEntries.reduce((sum, p) => sum + p.remainingWeight, 0);
+    const avgEntry = totalWeight
+      ? activeEntries.reduce((sum, p) => sum + p.avgEntry * p.remainingWeight, 0) / totalWeight
+      : sorted[0].avgEntry;
+
     const current = sorted.find((p) => p.current)?.current ?? null;
     const direction = sorted[0].direction;
 
@@ -190,12 +201,12 @@ function groupPositions(positions: Position[], status: 'open' | 'closed'): Group
       asset: sorted[0].asset,
       display: displaySymbol(sorted[0].asset),
       direction,
-      status: sorted[0].status,
+      status,
       avgEntry,
       firstEntryDate: sorted[0].entryDate,
       current,
       perf: calcPerf(direction, avgEntry, current),
-      entries: sorted,
+      entries: activeEntries,
     };
   });
 }
