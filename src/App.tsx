@@ -11,6 +11,10 @@ type Position = {
   status: 'open' | 'closed';
   current: number | null;
   lastUpdated: string | null;
+
+  weight: number;
+remainingWeight: number;
+realizedReturn: number;
 };
 
 type DbPosition = {
