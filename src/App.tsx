@@ -593,7 +593,7 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
                       <td className={group.perf >= 0 ? 'green' : 'red'}>{pct(group.perf)}</td>
                     </tr>
 
-                    {isExpanded && group.entries.map((entry) => {
+                    {isExpanded && group.entries.map((entry, index) => {
   const entryPerf = calcPerf(entry.direction, entry.avgEntry, entry.current);
 
   return (
