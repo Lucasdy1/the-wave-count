@@ -543,7 +543,7 @@ useEffect(() => {
             </thead>
             <tbody>
               {rows.length === 0 ? (
-                <tr><td colSpan={8} className="emptyRow">No positions yet.</td></tr>
+                <tr><td colSpan={7} className="emptyRow">No positions yet.</td></tr>
               ) : rows.map((group) => {
                 const isExpanded = expandedAsset === `${group.asset}-${group.status}`;
                 return (
