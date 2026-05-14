@@ -594,22 +594,25 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
                     </tr>
 
                     {isExpanded && group.entries.map((entry) => {
-                      const entryPerf = calcPerf(entry.direction, entry.avgEntry, entry.current);
-                      return (
-                        <tr key={entry.id} className="entrySubRow">
-  <td>↳ Entry</td>
-  <td>—</td>
-  <td>
-    {tab === 'closed'
-      ? `${entry.weight - entry.remainingWeight} / ${entry.weight}`
-      : `${entry.remainingWeight} / ${entry.weight}`}
-  </td>
-  <td>{entry.direction}</td>
-  <td>{entry.entryDate}</td>
-  <td>{money.format(entry.avgEntry)}</td>
-  <td>{entry.current ? money.format(entry.current) : 'Waiting for API'}</td>
-  <td className={entryPerf >= 0 ? 'green' : 'red'}>{pct(entryPerf)}</td>
-</tr>
+  const entryPerf = calcPerf(entry.direction, entry.avgEntry, entry.current);
+
+  return (
+    <tr key={entry.id} className="entrySubRow">
+      <td>↳ Entry</td>
+      <td>—</td>
+      <td>
+        {tab === 'closed'
+          ? `${entry.weight - entry.remainingWeight} / ${entry.weight}`
+          : `${entry.remainingWeight} / ${entry.weight}`}
+      </td>
+      <td>{entry.direction}</td>
+      <td>{entry.entryDate}</td>
+      <td>{money.format(entry.avgEntry)}</td>
+      <td>{entry.current ? money.format(entry.current) : 'Waiting for API'}</td>
+      <td className={entryPerf >= 0 ? 'green' : 'red'}>{pct(entryPerf)}</td>
+    </tr>
+  );
+})}
     {tab === 'closed'
       ? `${entry.weight - entry.remainingWeight} / ${entry.weight}`
       : `${entry.remainingWeight} / ${entry.weight}`}
