@@ -556,7 +556,6 @@ useEffect(() => {
                       <td>{money.format(group.avgEntry)}</td>
                       <td>{group.current ? money.format(group.current) : 'Waiting for API'}</td>
                       <td className={group.perf >= 0 ? 'green' : 'red'}>{pct(group.perf)}</td>
-                      </td>
                     </tr>
 
                     {isExpanded && group.entries.map((entry) => {
@@ -570,7 +569,6 @@ useEffect(() => {
                           <td>{money.format(entry.avgEntry)}</td>
                           <td>{entry.current ? money.format(entry.current) : 'Waiting for API'}</td>
                           <td className={entryPerf >= 0 ? 'green' : 'red'}>{pct(entryPerf)}</td>
-                          </td>
                         </tr>
                       );
                     })}
