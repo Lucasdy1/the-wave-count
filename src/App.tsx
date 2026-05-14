@@ -293,11 +293,21 @@ export default function Dashboard() {
     }
   }
 
-  useEffect(() => {
-    fetchPositions();
-    const interval = window.setInterval(() => refreshPrices(), 60 * 60 * 1000);
-    return () => window.clearInterval(interval);
-  }, []);
+ useEffect(() => {
+  fetchPositions();
+}, []);
+
+useEffect(() => {
+  if (!positions.length) return;
+
+  refreshPrices(positions);
+
+  const interval = window.setInterval(() => {
+    refreshPrices(positions);
+  }, 60 * 60 * 1000);
+
+  return () => window.clearInterval(interval);
+}, [positions.length]);
 
   const openGroups = useMemo(() => groupPositions(positions, 'open'), [positions]);
   const closedGroups = useMemo(() => groupPositions(positions, 'closed'), [positions]);
