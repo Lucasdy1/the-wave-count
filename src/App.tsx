@@ -477,7 +477,6 @@ useEffect(() => {
           <h1>The Wave Count</h1>
           <nav>
             <button className="active">Dashboard</button>
-            <button onClick={openAddTrade}>+ Add Trade</button>
           </nav>
         </header>
 
