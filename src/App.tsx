@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import './App.css';
+import { supabase } from './supabase';
 
 type Position = {
   id: number;
@@ -10,6 +11,17 @@ type Position = {
   status: 'open' | 'closed';
   current: number | null;
   lastUpdated: string | null;
+};
+
+type DbPosition = {
+  id: number;
+  asset: string;
+  direction: 'Long' | 'Short';
+  avg_entry: number;
+  entry_date: string;
+  status: 'open' | 'closed';
+  current: number | null;
+  last_updated: string | null;
 };
 
 type GroupedPosition = {
@@ -31,7 +43,7 @@ type FormState = {
   entryDate: string;
 };
 
-const ADMIN_PASSWORD = 'CHANGE_ME_123';
+const ADMIN_PASSWORD = 'Paul011212!12';
 const FINNHUB_API_KEY = import.meta.env.VITE_FINNHUB_API_KEY;
 
 const CRYPTO_SYMBOLS: Record<string, string> = {
@@ -67,27 +79,68 @@ const emptyForm: FormState = {
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 const pct = (value: number) => `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
 
-function load<T>(key: string, fallback: T): T {
-  try {
-    const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : fallback;
-  } catch {
-    return fallback;
-  }
+function fromDb(row: DbPosition): Position {
+  return {
+    id: row.id,
+    asset: row.asset,
+    direction: row.direction,
+    avgEntry: row.avg_entry,
+    entryDate: row.entry_date,
+    status: row.status,
+    current: row.current,
+    lastUpdated: row.last_updated,
+  };
 }
 
-function save<T>(key: string, value: T) {
-  localStorage.setItem(key, JSON.stringify(value));
+function toDb(position: Omit<Position, 'id'>) {
+  return {
+    asset: position.asset,
+    direction: position.direction,
+    avg_entry: position.avgEntry,
+    entry_date: position.entryDate,
+    status: position.status,
+    current: position.current,
+    last_updated: position.lastUpdated,
+  };
 }
 
 async function fetchPrice(symbol: string): Promise<number | null> {
-  if (!FINNHUB_API_KEY || FINNHUB_API_KEY === 'PASTE_YOUR_FINNHUB_KEY_HERE') return null;
+  const clean = symbol.toUpperCase();
+
+  const cryptoMap: Record<string, string> = {
+    BTC: 'bitcoin',
+    ETH: 'ethereum',
+    SOL: 'solana',
+    XRP: 'ripple',
+    ADA: 'cardano',
+    DOGE: 'dogecoin',
+    LINK: 'chainlink',
+    AVAX: 'avalanche-2',
+  };
 
   try {
-    const apiSymbol = encodeURIComponent(normalizeSymbol(symbol));
-    const response = await fetch(`https://finnhub.io/api/v1/quote?symbol=${apiSymbol}&token=${FINNHUB_API_KEY}`);
+    // CRYPTO → CoinGecko
+    if (cryptoMap[clean]) {
+      const res = await fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${cryptoMap[clean]}&vs_currencies=usd`
+      );
+
+      const data = await res.json();
+      return data?.[cryptoMap[clean]]?.usd ?? null;
+    }
+
+    // STOCKS → Finnhub
+    if (!FINNHUB_API_KEY) return null;
+
+    const response = await fetch(
+      `https://finnhub.io/api/v1/quote?symbol=${clean}&token=${FINNHUB_API_KEY}`
+    );
+
     const data = await response.json();
-    return typeof data.c === 'number' && data.c > 0 ? data.c : null;
+
+    return typeof data.c === 'number' && data.c > 0
+      ? data.c
+      : null;
   } catch {
     return null;
   }
@@ -196,14 +249,55 @@ function Donut({ groups }: { groups: GroupedPosition[] }) {
 }
 
 export default function Dashboard() {
-  const [positions, setPositions] = useState<Position[]>(() => load('wave-count-positions-v5', []));
+  const [positions, setPositions] = useState<Position[]>([]);
   const [tab, setTab] = useState<'open' | 'closed'>('open');
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [expandedAsset, setExpandedAsset] = useState<string | null>(null);
 
-  useEffect(() => save('wave-count-positions-v5', positions), [positions]);
+  async function fetchPositions() {
+    const { data, error } = await supabase
+      .from('positions')
+      .select('*')
+      .order('entry_date', { ascending: true });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setPositions((data ?? []).map((row) => fromDb(row as DbPosition)));
+  }
+
+  async function refreshPrices(currentPositions = positions) {
+    const symbols = Array.from(new Set(currentPositions.map((p) => p.asset)));
+    const updates: Record<string, number | null> = {};
+
+    for (const symbol of symbols) {
+      updates[symbol] = await fetchPrice(symbol);
+    }
+
+    const changed = currentPositions.map((p) => {
+      const price = updates[p.asset];
+      return price ? { ...p, current: price, lastUpdated: new Date().toISOString() } : p;
+    });
+
+    setPositions(changed);
+
+    for (const p of changed) {
+      await supabase
+        .from('positions')
+        .update({ current: p.current, last_updated: p.lastUpdated })
+        .eq('id', p.id);
+    }
+  }
+
+  useEffect(() => {
+    fetchPositions();
+    const interval = window.setInterval(() => refreshPrices(), 60 * 60 * 1000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   const openGroups = useMemo(() => groupPositions(positions, 'open'), [positions]);
   const closedGroups = useMemo(() => groupPositions(positions, 'closed'), [positions]);
@@ -223,28 +317,6 @@ export default function Dashboard() {
     if (!closedGroups.length) return 0;
     return closedGroups.reduce((sum, g) => sum + g.perf, 0) / closedGroups.length;
   }, [closedGroups]);
-
-  async function refreshPrices(currentPositions = positions) {
-    const symbols = Array.from(new Set(currentPositions.map((p) => p.asset)));
-    const updates: Record<string, number | null> = {};
-
-    for (const symbol of symbols) {
-      updates[symbol] = await fetchPrice(symbol);
-    }
-
-    setPositions((prev) =>
-      prev.map((p) => {
-        const price = updates[p.asset];
-        return price ? { ...p, current: price, lastUpdated: new Date().toISOString() } : p;
-      })
-    );
-  }
-
-  useEffect(() => {
-    refreshPrices();
-    const interval = window.setInterval(() => refreshPrices(), 60 * 60 * 1000);
-    return () => window.clearInterval(interval);
-  }, []);
 
   function requireAdmin() {
     const password = window.prompt('Enter admin password');
@@ -280,8 +352,7 @@ export default function Dashboard() {
     const normalizedAsset = normalizeSymbol(form.asset);
     const oldPosition = editingId ? positions.find((p) => p.id === editingId) : null;
 
-    const next: Position = {
-      id: editingId ?? Date.now(),
+    const nextWithoutId: Omit<Position, 'id'> = {
       asset: normalizedAsset,
       direction: form.direction,
       avgEntry: Number(form.avgEntry),
@@ -291,54 +362,102 @@ export default function Dashboard() {
       lastUpdated: oldPosition?.lastUpdated ?? null,
     };
 
-    if (!next.asset || !next.avgEntry || !next.entryDate) return;
+    if (!nextWithoutId.asset || !nextWithoutId.avgEntry || !nextWithoutId.entryDate) return;
 
-    const nextPositions = editingId
-      ? positions.map((p) => (p.id === editingId ? next : p))
-      : [next, ...positions];
+    if (editingId) {
+      const { error } = await supabase
+        .from('positions')
+        .update(toDb(nextWithoutId))
+        .eq('id', editingId);
 
-    setPositions(nextPositions);
+      if (error) {
+        console.error(error);
+        alert('Could not update entry. Check Supabase RLS/policies.');
+        return;
+      }
+    } else {
+      const { error } = await supabase
+        .from('positions')
+        .insert(toDb(nextWithoutId));
+
+      if (error) {
+        console.error(error);
+        alert('Could not save entry. Check Supabase RLS/policies.');
+        return;
+      }
+    }
+
     setForm(emptyForm);
     setEditingId(null);
     setShowForm(false);
     setTab('open');
-
-    await refreshPrices(nextPositions);
+    await fetchPositions();
+    await refreshPrices();
   }
 
-  function closeEntry(id: number) {
+  async function updateEntries(ids: number[], patch: Partial<DbPosition>) {
+    const { error } = await supabase
+      .from('positions')
+      .update(patch)
+      .in('id', ids);
+
+    if (error) {
+      console.error(error);
+      alert('Could not update entry. Check Supabase RLS/policies.');
+      return;
+    }
+
+    await fetchPositions();
+  }
+
+  async function closeEntry(id: number) {
     if (!requireAdmin()) return;
-    setPositions((prev) => prev.map((p) => (p.id === id ? { ...p, status: 'closed' } : p)));
+    await updateEntries([id], { status: 'closed' });
   }
 
-  function reopenEntry(id: number) {
+  async function reopenEntry(id: number) {
     if (!requireAdmin()) return;
-    setPositions((prev) => prev.map((p) => (p.id === id ? { ...p, status: 'open' } : p)));
+    await updateEntries([id], { status: 'open' });
   }
 
-  function closeGroup(group: GroupedPosition) {
+  async function closeGroup(group: GroupedPosition) {
     if (!requireAdmin()) return;
-    const ids = new Set(group.entries.map((e) => e.id));
-    setPositions((prev) => prev.map((p) => (ids.has(p.id) ? { ...p, status: 'closed' } : p)));
+    await updateEntries(group.entries.map((e) => e.id), { status: 'closed' });
   }
 
-  function reopenGroup(group: GroupedPosition) {
+  async function reopenGroup(group: GroupedPosition) {
     if (!requireAdmin()) return;
-    const ids = new Set(group.entries.map((e) => e.id));
-    setPositions((prev) => prev.map((p) => (ids.has(p.id) ? { ...p, status: 'open' } : p)));
+    await updateEntries(group.entries.map((e) => e.id), { status: 'open' });
   }
 
-  function deleteEntry(id: number) {
+  async function deleteEntry(id: number) {
     if (!requireAdmin()) return;
     if (!window.confirm('Delete this entry?')) return;
-    setPositions((prev) => prev.filter((p) => p.id !== id));
+
+    const { error } = await supabase.from('positions').delete().eq('id', id);
+    if (error) {
+      console.error(error);
+      alert('Could not delete entry. Check Supabase RLS/policies.');
+      return;
+    }
+    await fetchPositions();
   }
 
-  function deleteGroup(group: GroupedPosition) {
+  async function deleteGroup(group: GroupedPosition) {
     if (!requireAdmin()) return;
     if (!window.confirm(`Delete all entries for ${group.display}?`)) return;
-    const ids = new Set(group.entries.map((e) => e.id));
-    setPositions((prev) => prev.filter((p) => !ids.has(p.id)));
+
+    const { error } = await supabase
+      .from('positions')
+      .delete()
+      .in('id', group.entries.map((e) => e.id));
+
+    if (error) {
+      console.error(error);
+      alert('Could not delete entries. Check Supabase RLS/policies.');
+      return;
+    }
+    await fetchPositions();
   }
 
   return (
@@ -416,7 +535,7 @@ export default function Dashboard() {
             </thead>
             <tbody>
               {rows.length === 0 ? (
-                <tr><td colSpan={7} className="emptyRow">No positions yet.</td></tr>
+                <tr><td colSpan={8} className="emptyRow">No positions yet.</td></tr>
               ) : rows.map((group) => {
                 const isExpanded = expandedAsset === `${group.asset}-${group.status}`;
                 return (
@@ -437,26 +556,27 @@ export default function Dashboard() {
                       </td>
                     </tr>
 
-                    {isExpanded && group.entries.map((entry) => (
-                      <tr key={entry.id} className="entrySubRow">
-                        <td>↳ Entry</td>
-                        <td>—</td>
-                        <td>{entry.direction}</td>
-                        <td>{entry.entryDate}</td>
-                        <td>{money.format(entry.avgEntry)}</td>
-                        <td>{entry.current ? money.format(entry.current) : 'Waiting for API'}</td>
-                        <td className={calcPerf(entry.direction, entry.avgEntry, entry.current) >= 0 ? 'green' : 'red'}>
-                          {pct(calcPerf(entry.direction, entry.avgEntry, entry.current))}
-                        </td>
-                        <td className="actions">
-                          <button onClick={() => openEdit(entry)}>Edit</button>
-                          {entry.status === 'open'
-                            ? <button onClick={() => closeEntry(entry.id)}>Close</button>
-                            : <button onClick={() => reopenEntry(entry.id)}>Reopen</button>}
-                          <button onClick={() => deleteEntry(entry.id)}>Delete</button>
-                        </td>
-                      </tr>
-                    ))}
+                    {isExpanded && group.entries.map((entry) => {
+                      const entryPerf = calcPerf(entry.direction, entry.avgEntry, entry.current);
+                      return (
+                        <tr key={entry.id} className="entrySubRow">
+                          <td>↳ Entry</td>
+                          <td>—</td>
+                          <td>{entry.direction}</td>
+                          <td>{entry.entryDate}</td>
+                          <td>{money.format(entry.avgEntry)}</td>
+                          <td>{entry.current ? money.format(entry.current) : 'Waiting for API'}</td>
+                          <td className={entryPerf >= 0 ? 'green' : 'red'}>{pct(entryPerf)}</td>
+                          <td className="actions">
+                            <button onClick={() => openEdit(entry)}>Edit</button>
+                            {entry.status === 'open'
+                              ? <button onClick={() => closeEntry(entry.id)}>Close</button>
+                              : <button onClick={() => reopenEntry(entry.id)}>Reopen</button>}
+                            <button onClick={() => deleteEntry(entry.id)}>Delete</button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </React.Fragment>
                 );
               })}
