@@ -556,11 +556,6 @@ useEffect(() => {
                       <td>{money.format(group.avgEntry)}</td>
                       <td>{group.current ? money.format(group.current) : 'Waiting for API'}</td>
                       <td className={group.perf >= 0 ? 'green' : 'red'}>{pct(group.perf)}</td>
-                      <td className="actions" onClick={(e) => e.stopPropagation()}>
-                        {group.status === 'open'
-                          ? <button onClick={() => closeGroup(group)}>Close</button>
-                          : <button onClick={() => reopenGroup(group)}>Reopen</button>}
-                        <button onClick={() => deleteGroup(group)}>Delete</button>
                       </td>
                     </tr>
 
