@@ -26,6 +26,10 @@ type DbPosition = {
   status: 'open' | 'closed';
   current: number | null;
   last_updated: string | null;
+
+  weight: number;
+remaining_weight: number;
+realized_return: number;
 };
 
 type GroupedPosition = {
