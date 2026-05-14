@@ -599,7 +599,7 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
   return (
     <tr key={entry.id} className="entrySubRow">
       <td>↳ Entry</td>
-      <td>—</td>
+      <td>ENTRY</td>
       <td>
         {tab === 'closed'
           ? `${entry.weight - entry.remainingWeight} / ${entry.weight}`
