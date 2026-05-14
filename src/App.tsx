@@ -539,7 +539,6 @@ useEffect(() => {
                 <th>Avg Entry</th>
                 <th>Current</th>
                 <th>Perf.</th>
-                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
