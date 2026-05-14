@@ -386,6 +386,10 @@ useEffect(() => {
       status: oldPosition?.status ?? 'open',
       current: oldPosition?.current ?? null,
       lastUpdated: oldPosition?.lastUpdated ?? null,
+
+      weight: oldPosition?.weight ?? 100,
+remainingWeight: oldPosition?.remainingWeight ?? 100,
+realizedReturn: oldPosition?.realizedReturn ?? 0,
     };
 
     if (!nextWithoutId.asset || !nextWithoutId.avgEntry || !nextWithoutId.entryDate) return;
