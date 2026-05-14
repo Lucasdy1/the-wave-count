@@ -570,12 +570,6 @@ useEffect(() => {
                           <td>{money.format(entry.avgEntry)}</td>
                           <td>{entry.current ? money.format(entry.current) : 'Waiting for API'}</td>
                           <td className={entryPerf >= 0 ? 'green' : 'red'}>{pct(entryPerf)}</td>
-                          <td className="actions">
-                            <button onClick={() => openEdit(entry)}>Edit</button>
-                            {entry.status === 'open'
-                              ? <button onClick={() => closeEntry(entry.id)}>Close</button>
-                              : <button onClick={() => reopenEntry(entry.id)}>Reopen</button>}
-                            <button onClick={() => deleteEntry(entry.id)}>Delete</button>
                           </td>
                         </tr>
                       );
