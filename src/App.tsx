@@ -565,7 +565,7 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
               <tr>
                 <th>Asset</th>
                 <th>Entries</th>
-                <th>Remaining</th>
+                <th>{tab === 'closed' ? 'Closed' : 'Remaining'}</th>
                 <th>Direction</th>
                 <th>First Entry</th>
                 <th>Avg Entry</th>
