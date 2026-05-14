@@ -598,7 +598,11 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
                       return (
                         <tr key={entry.id} className="entrySubRow">
                           <td>↳ Entry</td>
-                          <td>—</td>
+                         <td>
+
+  {entry.remainingWeight} / {entry.weight}
+
+</td>
                           <td>{entry.direction}</td>
                           <td>{entry.entryDate}</td>
                           <td>{money.format(entry.avgEntry)}</td>
