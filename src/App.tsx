@@ -226,6 +226,8 @@ function Donut({ groups }: { groups: GroupedPosition[] }) {
 
   const radius = 62;
   const circumference = 2 * Math.PI * radius;
+  const count = groups.length;
+const slice = circumference / count;
   const colors = ['#4ade80', '#60a5fa', '#f59e0b', '#c084fc', '#fb7185', '#22d3ee', '#a3e635'];
 
   return (
