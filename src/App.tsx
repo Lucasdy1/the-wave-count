@@ -213,13 +213,19 @@ function groupPositions(positions: Position[], status: 'open' | 'closed'): Group
 
 function Donut({ groups }: { groups: GroupedPosition[] }) {
   const [hovered, setHovered] = useState<GroupedPosition | null>(null);
-  const count = groups.length;
 
-  if (!count) return <div className="empty">No positions yet.</div>;
+  const totalWeight = groups.reduce(
+    (sum, group) =>
+      sum + group.entries.reduce((entrySum, entry) => entrySum + entry.remainingWeight, 0),
+    0
+  );
+
+  if (!groups.length || totalWeight === 0) {
+    return <div className="empty">No positions yet.</div>;
+  }
 
   const radius = 62;
   const circumference = 2 * Math.PI * radius;
-  const slice = circumference / count;
   const colors = ['#4ade80', '#60a5fa', '#f59e0b', '#c084fc', '#fb7185', '#22d3ee', '#a3e635'];
 
   return (
