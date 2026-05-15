@@ -621,7 +621,12 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
   return (
     <tr key={entry.id} className="entrySubRow">
       <td>↳ Entry</td>
-      <td>{index + 1}</td>
+      <td>
+  {positions
+    .filter((p) => p.asset === entry.asset && p.direction === entry.direction)
+    .sort((a, b) => a.entryDate.localeCompare(b.entryDate))
+    .findIndex((p) => p.id === entry.id) + 1}
+</td>
       <td>
         {tab === 'closed'
           ? `${entry.weight - entry.remainingWeight} / ${entry.weight}`
