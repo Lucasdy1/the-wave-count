@@ -584,7 +584,9 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
                       <td><b>{isExpanded ? '▾' : '▸'} {group.display}</b></td>
                       <td>{group.entries.length}</td>
                       <td>
-  {group.entries.reduce((sum, entry) => sum + entry.remainingWeight, 0)} / {group.entries.reduce((sum, entry) => sum + entry.weight, 0)}
+  {tab === 'closed'
+    ? `${group.entries.reduce((sum, entry) => sum + (entry.weight - entry.remainingWeight), 0)} / ${group.entries.reduce((sum, entry) => sum + entry.weight, 0)}`
+    : `${group.entries.reduce((sum, entry) => sum + entry.remainingWeight, 0)} / ${group.entries.reduce((sum, entry) => sum + entry.weight, 0)}`}
 </td>
                       <td>{group.direction}</td>
                       <td>{group.firstEntryDate}</td>
