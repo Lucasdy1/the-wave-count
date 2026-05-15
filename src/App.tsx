@@ -214,11 +214,10 @@ function groupPositions(positions: Position[], status: 'open' | 'closed'): Group
 function Donut({ groups }: { groups: GroupedPosition[] }) {
   const [hovered, setHovered] = useState<GroupedPosition | null>(null);
 
-  const totalWeight = groups.reduce(
-    (sum, group) =>
-      sum + group.entries.reduce((entrySum, entry) => entrySum + entry.remainingWeight, 0),
-    0
-  );
+  const groupWeight = (group: GroupedPosition) =>
+    group.entries.reduce((sum, entry) => sum + entry.remainingWeight, 0);
+
+  const totalWeight = groups.reduce((sum, group) => sum + groupWeight(group), 0);
 
   if (!groups.length || totalWeight === 0) {
     return <div className="empty">No positions yet.</div>;
@@ -226,36 +225,44 @@ function Donut({ groups }: { groups: GroupedPosition[] }) {
 
   const radius = 62;
   const circumference = 2 * Math.PI * radius;
-  const count = groups.length;
-const slice = circumference / count;
   const colors = ['#4ade80', '#60a5fa', '#f59e0b', '#c084fc', '#fb7185', '#22d3ee', '#a3e635'];
+
+  let offset = 0;
 
   return (
     <div className="donutWrap allocationGrid">
       <div className="donutChart">
         <svg width="230" height="230" viewBox="0 0 230 230">
           <circle cx="115" cy="115" r={radius} fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="32" />
-          {groups.map((g, index) => (
-            <circle
-              key={g.asset}
-              cx="115"
-              cy="115"
-              r={radius}
-              fill="none"
-              stroke={colors[index % colors.length]}
-              strokeWidth="32"
-              strokeDasharray={`${slice - 2} ${circumference - slice + 2}`}
-              strokeDashoffset={-(slice * index)}
-              transform="rotate(-90 115 115)"
-              onMouseEnter={() => setHovered(g)}
-              onMouseLeave={() => setHovered(null)}
-              className="donutSlice"
-            />
-          ))}
+
+          {groups.map((g, index) => {
+            const weight = groupWeight(g);
+            const slice = (weight / totalWeight) * circumference;
+            const dashOffset = -offset;
+            offset += slice;
+
+            return (
+              <circle
+                key={g.asset}
+                cx="115"
+                cy="115"
+                r={radius}
+                fill="none"
+                stroke={colors[index % colors.length]}
+                strokeWidth="32"
+                strokeDasharray={`${slice - 2} ${circumference - slice + 2}`}
+                strokeDashoffset={dashOffset}
+                transform="rotate(-90 115 115)"
+                onMouseEnter={() => setHovered(g)}
+                onMouseLeave={() => setHovered(null)}
+                className="donutSlice"
+              />
+            );
+          })}
         </svg>
 
         <div className="donutCenter">
-          <b>{count}</b>
+          <b>{groups.length}</b>
           <span>Positions</span>
         </div>
 
@@ -268,16 +275,21 @@ const slice = circumference / count;
       </div>
 
       <div className="donutLegend allocationScroll">
-        {groups.map((g, index) => (
-          <div key={g.asset} className="legendRow allocationRowBig">
-            <span style={{ background: colors[index % colors.length] }} />
-            <div>
-              <b>{g.display}</b>
-              <small> · avg {money.format(g.avgEntry)}</small>
+        {groups.map((g, index) => {
+          const weight = groupWeight(g);
+          const share = (weight / totalWeight) * 100;
+
+          return (
+            <div key={g.asset} className="legendRow allocationRowBig">
+              <span style={{ background: colors[index % colors.length] }} />
+              <div>
+                <b>{g.display}</b>
+                <small> · avg {money.format(g.avgEntry)}</small>
+              </div>
+              <em>{share.toFixed(1)}%</em>
             </div>
-            <em>{(100 / count).toFixed(1)}%</em>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
