@@ -371,9 +371,25 @@ useEffect(() => {
   }, [openGroups]);
 
   const closedAvg = useMemo(() => {
-    if (!closedGroups.length) return 0;
-    return closedGroups.reduce((sum, g) => sum + g.perf, 0) / closedGroups.length;
-  }, [closedGroups]);
+  const totalPortfolioWeight = positions.reduce(
+    (sum, p) => sum + p.weight,
+    0
+  );
+
+  if (totalPortfolioWeight === 0) return 0;
+
+  const realizedImpact = positions.reduce((sum, p) => {
+    const closedWeight = p.weight - p.remainingWeight;
+
+    if (closedWeight <= 0 || !p.current) return sum;
+
+    const perf = calcPerf(p.direction, p.avgEntry, p.current);
+
+    return sum + perf * (closedWeight / totalPortfolioWeight);
+  }, 0);
+
+  return realizedImpact;
+}, [positions]);
 
   function requireAdmin() {
     const password = window.prompt('Enter admin password');
