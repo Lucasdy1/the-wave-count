@@ -361,9 +361,23 @@ useEffect(() => {
   const rows = tab === 'open' ? openGroups : closedGroups;
 
   const avgReturn = useMemo(() => {
-    if (!openGroups.length) return 0;
-    return openGroups.reduce((sum, g) => sum + g.perf, 0) / openGroups.length;
-  }, [openGroups]);
+  const totalPortfolioWeight = positions.reduce(
+    (sum, p) => sum + p.weight,
+    0
+  );
+
+  if (totalPortfolioWeight === 0) return 0;
+
+  const openImpact = positions.reduce((sum, p) => {
+    if (p.remainingWeight <= 0 || !p.current) return sum;
+
+    const perf = calcPerf(p.direction, p.avgEntry, p.current);
+
+    return sum + perf * (p.remainingWeight / totalPortfolioWeight);
+  }, 0);
+
+  return openImpact;
+}, [positions]);
 
   const best = useMemo(() => {
     if (!openGroups.length) return null;
