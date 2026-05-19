@@ -401,28 +401,30 @@ export default function Dashboard() {
     }
   }
 
- useEffect(() => {
+useEffect(() => {
   fetchPositions();
+  fetchSnapshots();
+}, []);
 
-  const loadSnapshots = async () => {
-    const { data, error } = await supabase
-      .from('portfolio_snapshots')
-      .select('*')
-      .order('created_at', { ascending: true });
+ const fetchSnapshots = async () => {
+  const { data, error } = await supabase
+    .from('portfolio_snapshots')
+    .select('*')
+    .order('created_at', { ascending: true });
 
-    if (!error && data) {
-      setSnapshots(
-        data.map((s: DbPortfolioSnapshot) => ({
-          id: s.id,
-          date: s.date,
-          openReturn: s.open_return,
-          closedReturn: s.closed_return,
-          totalReturn: s.total_return,
-          createdAt: s.created_at,
-        }))
-      );
-    }
-  };
+  if (!error && data) {
+    setSnapshots(
+      data.map((s: DbPortfolioSnapshot) => ({
+        id: s.id,
+        date: s.date,
+        openReturn: s.open_return,
+        closedReturn: s.closed_return,
+        totalReturn: s.total_return,
+        createdAt: s.created_at,
+      }))
+    );
+  }
+};
 
   loadSnapshots();
 }, []);
