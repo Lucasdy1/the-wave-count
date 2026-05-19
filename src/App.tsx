@@ -369,7 +369,7 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
   }}
   onMouseLeave={() => setHovered(null)}
 >
-  <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+ <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
         {/* zero line */}
         <line
           x1="0"
