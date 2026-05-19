@@ -331,7 +331,7 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
   const max = Math.max(1, ...points.map((p) => p.value));
 
   const width = 700;
-  const height = 240;
+  const height = 320;
 
   const coords = points.map((p, index) => {
     const x =
