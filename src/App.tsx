@@ -314,6 +314,8 @@ function Donut({ groups }: { groups: GroupedPosition[] }) {
 }
 
 function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
+  const [hovered, setHovered] = useState<number | null>(null);
+
   if (!snapshots.length) {
     return <div className="empty">No portfolio history yet.</div>;
   }
@@ -325,12 +327,19 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
 
   const min = Math.min(0, ...points.map((p) => p.value));
   const max = Math.max(1, ...points.map((p) => p.value));
+
   const width = 700;
   const height = 240;
 
   const coords = points.map((p, index) => {
-    const x = points.length === 1 ? 0 : (index / (points.length - 1)) * width;
-    const y = height - ((p.value - min) / (max - min || 1)) * height;
+    const x =
+      points.length === 1
+        ? width / 2
+        : (index / (points.length - 1)) * width;
+
+    const y =
+      height - ((p.value - min) / (max - min || 1)) * height;
+
     return { ...p, x, y };
   });
 
@@ -340,16 +349,101 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
 
   const area = `${line} L ${width} ${height} L 0 ${height} Z`;
 
+  const hoveredPoint =
+    hovered !== null ? coords[hovered] : null;
+
+  const zeroY =
+    height - ((0 - min) / (max - min || 1)) * height;
+
   return (
     <div className="chart">
-      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
-        <line x1="0" x2={width} y1={height / 2} y2={height / 2} stroke="rgba(255,255,255,.10)" />
-        <path d={area} fill="rgba(74, 222, 128, .12)" />
-        <path d={line} fill="none" stroke="rgb(74, 222, 128)" strokeWidth="4" />
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="none"
+        onMouseLeave={() => setHovered(null)}
+      >
+        {/* zero line */}
+        <line
+          x1="0"
+          x2={width}
+          y1={zeroY}
+          y2={zeroY}
+          stroke="rgba(255,255,255,.12)"
+          strokeDasharray="6 6"
+        />
+
+        {/* area */}
+        <path
+          d={area}
+          fill="rgba(74, 222, 128, .12)"
+        />
+
+        {/* line */}
+        <path
+          d={line}
+          fill="none"
+          stroke="rgb(74, 222, 128)"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+
+        {/* hover zones */}
+        {coords.map((p, index) => (
+          <g
+            key={index}
+            onMouseEnter={() => setHovered(index)}
+          >
+            <rect
+              x={p.x - width / coords.length / 2}
+              y={0}
+              width={width / coords.length}
+              height={height}
+              fill="transparent"
+            />
+          </g>
+        ))}
+
+        {/* hover line */}
+        {hoveredPoint && (
+          <>
+            <line
+              x1={hoveredPoint.x}
+              x2={hoveredPoint.x}
+              y1={0}
+              y2={height}
+              stroke="rgba(255,255,255,.25)"
+              strokeDasharray="5 5"
+            />
+
+            <circle
+              cx={hoveredPoint.x}
+              cy={hoveredPoint.y}
+              r="6"
+              fill="rgb(74, 222, 128)"
+            />
+
+            <text
+              x={hoveredPoint.x + 10}
+              y={hoveredPoint.y - 12}
+              fill="white"
+              fontSize="12"
+            >
+              {hoveredPoint.value.toFixed(2)}%
+            </text>
+          </>
+        )}
       </svg>
+
       <div className="chartLabels">
-        <span>{points[0]?.date}</span>
-        <span>{points[points.length - 1]?.date}</span>
+        <span>
+          {hoveredPoint
+            ? hoveredPoint.date
+            : points[0]?.date}
+        </span>
+
+        <span>
+          {max.toFixed(0)}%
+        </span>
       </div>
     </div>
   );
