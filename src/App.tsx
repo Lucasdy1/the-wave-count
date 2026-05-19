@@ -320,6 +320,7 @@ export default function Dashboard() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [expandedAsset, setExpandedAsset] = useState<string | null>(null);
+  const [snapshots, setSnapshots] = useState<PortfolioSnapshot[]>([]);
 
   async function fetchPositions() {
     const { data, error } = await supabase
