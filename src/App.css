@@ -308,3 +308,9 @@ td:last-child {
 .chartTooltip span {
   opacity: .7;
 }
+
+.cleanChart svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
