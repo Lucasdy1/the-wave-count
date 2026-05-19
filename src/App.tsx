@@ -446,6 +446,43 @@ useEffect(() => {
   return realizedImpact;
 }, [positions]);
 
+  useEffect(() => {
+  if (!positions.length) return;
+
+  const saveSnapshot = async () => {
+    const today = new Date().toISOString().split('T')[0];
+    const totalReturn = avgReturn + closedAvg;
+
+    const { data: existing } = await supabase
+      .from('portfolio_snapshots')
+      .select('id')
+      .eq('date', today)
+      .maybeSingle();
+
+    if (existing) {
+      await supabase
+        .from('portfolio_snapshots')
+        .update({
+          open_return: avgReturn,
+          closed_return: closedAvg,
+          total_return: totalReturn,
+        })
+        .eq('id', existing.id);
+    } else {
+      await supabase
+        .from('portfolio_snapshots')
+        .insert({
+          date: today,
+          open_return: avgReturn,
+          closed_return: closedAvg,
+          total_return: totalReturn,
+        });
+    }
+  };
+
+  saveSnapshot();
+}, [avgReturn, closedAvg, positions]);
+
   function requireAdmin() {
     const password = window.prompt('Enter admin password');
     if (password !== ADMIN_PASSWORD) {
