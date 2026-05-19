@@ -357,11 +357,17 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
 
   return (
     <div className="chart">
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        preserveAspectRatio="none"
-        onMouseLeave={() => setHovered(null)}
-      >
+      <div
+  className="chartInner"
+  onMouseMove={(e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const index = Math.round((x / rect.width) * (coords.length - 1));
+    setHovered(Math.max(0, Math.min(coords.length - 1, index)));
+  }}
+  onMouseLeave={() => setHovered(null)}
+>
+  <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
         {/* zero line */}
         <line
           x1="0"
@@ -432,7 +438,8 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
             </text>
           </>
         )}
-      </svg>
+        </svg>
+</div>
 
       <div className="chartLabels">
         <span>
