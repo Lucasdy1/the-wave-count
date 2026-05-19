@@ -32,6 +32,24 @@ remaining_weight: number;
 realized_return: number;
 };
 
+type PortfolioSnapshot = {
+  id: number;
+  date: string;
+  openReturn: number;
+  closedReturn: number;
+  totalReturn: number;
+  createdAt: string;
+};
+
+type DbPortfolioSnapshot = {
+  id: number;
+  date: string;
+  open_return: number;
+  closed_return: number;
+  total_return: number;
+  created_at: string;
+};
+
 type GroupedPosition = {
   asset: string;
   display: string;
