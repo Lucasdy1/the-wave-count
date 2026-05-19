@@ -363,11 +363,14 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
 
   const area = `${line} L ${coords[coords.length - 1].x} ${baselineY} L ${coords[0].x} ${baselineY} Z`;
 
-  const yTicks = Array.from({ length: 5 }, (_, index) => {
-    const value = max - ((max - min) / 4) * index;
-    const y = paddingTop + (chartHeight / 4) * index;
-    return { value, y };
-  });
+  const yTicks = [50, 40, 30, 20, 10, 0].map((value) => {
+  const y =
+    paddingTop +
+    chartHeight -
+    ((value - min) / (max - min || 1)) * chartHeight;
+
+  return { value, y };
+});
 
   const monthLabels = points.filter((p, index, arr) => {
     if (index === 0 || index === arr.length - 1) return true;
