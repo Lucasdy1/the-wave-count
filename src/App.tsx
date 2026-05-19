@@ -320,7 +320,9 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
     return <div className="empty">No portfolio history yet.</div>;
   }
 
-  const points = snapshots.map((s) => ({
+  const points = [...snapshots]
+  .sort((a, b) => a.date.localeCompare(b.date))
+  .map((s) => ({
     date: s.date,
     value: s.totalReturn,
   }));
