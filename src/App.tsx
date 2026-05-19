@@ -428,17 +428,21 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
               fill="rgb(74, 222, 128)"
             />
 
-            <text
-              x={hoveredPoint.x + 10}
-              y={hoveredPoint.y - 12}
-              fill="white"
-              fontSize="12"
-            >
-              {hoveredPoint.value.toFixed(2)}%
-            </text>
           </>
         )}
         </svg>
+        {hoveredPoint && (
+  <div
+    className="chartTooltip"
+    style={{
+      left: `${(hoveredPoint.x / width) * 100}%`,
+      top: `${(hoveredPoint.y / height) * 100}%`,
+    }}
+  >
+    <b>{hoveredPoint.value.toFixed(2)}%</b>
+    <span>{hoveredPoint.date}</span>
+  </div>
+)}
 </div>
 
       <div className="chartLabels">
