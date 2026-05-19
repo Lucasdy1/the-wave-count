@@ -314,33 +314,40 @@ function Donut({ groups }: { groups: GroupedPosition[] }) {
 }
 
 function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
-  const [hovered, setHovered] = useState<number | null>(null);
-
   if (!snapshots.length) {
     return <div className="empty">No portfolio history yet.</div>;
   }
 
   const points = [...snapshots]
-  .sort((a, b) => a.date.localeCompare(b.date))
-  .map((s) => ({
-    date: s.date,
-    value: s.totalReturn,
-  }));
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map((s) => ({
+      date: s.date,
+      value: s.totalReturn,
+    }));
 
   const min = Math.min(0, ...points.map((p) => p.value));
-  const max = Math.max(1, ...points.map((p) => p.value));
+  const max = Math.max(10, ...points.map((p) => p.value));
 
   const width = 700;
   const height = 320;
+  const paddingLeft = 54;
+  const paddingRight = 18;
+  const paddingTop = 24;
+  const paddingBottom = 34;
+
+  const chartWidth = width - paddingLeft - paddingRight;
+  const chartHeight = height - paddingTop - paddingBottom;
 
   const coords = points.map((p, index) => {
     const x =
       points.length === 1
-        ? width / 2
-        : (index / (points.length - 1)) * width;
+        ? paddingLeft + chartWidth / 2
+        : paddingLeft + (index / (points.length - 1)) * chartWidth;
 
     const y =
-      height - ((p.value - min) / (max - min || 1)) * height;
+      paddingTop +
+      chartHeight -
+      ((p.value - min) / (max - min || 1)) * chartHeight;
 
     return { ...p, x, y };
   });
@@ -349,115 +356,99 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
     .map((p, index) => `${index === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
     .join(' ');
 
-  const area = `${line} L ${width} ${height} L 0 ${height} Z`;
+  const baselineY =
+    paddingTop +
+    chartHeight -
+    ((0 - min) / (max - min || 1)) * chartHeight;
 
-  const hoveredPoint =
-    hovered !== null ? coords[hovered] : null;
+  const area = `${line} L ${coords[coords.length - 1].x} ${baselineY} L ${coords[0].x} ${baselineY} Z`;
 
-  const zeroY =
-    height - ((0 - min) / (max - min || 1)) * height;
+  const yTicks = Array.from({ length: 5 }, (_, index) => {
+    const value = max - ((max - min) / 4) * index;
+    const y = paddingTop + (chartHeight / 4) * index;
+    return { value, y };
+  });
+
+  const monthLabels = points.filter((p, index, arr) => {
+    if (index === 0 || index === arr.length - 1) return true;
+    const prev = arr[index - 1];
+    return p.date.slice(0, 7) !== prev.date.slice(0, 7);
+  });
 
   return (
-    <div className="chart">
-      <div
-  className="chartInner"
-  onMouseMove={(e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const index = Math.round((x / rect.width) * (coords.length - 1));
-    setHovered(Math.max(0, Math.min(coords.length - 1, index)));
-  }}
-  onMouseLeave={() => setHovered(null)}
->
- <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
-        {/* zero line */}
+    <div className="chart cleanChart">
+      <svg viewBox={`0 0 ${width} ${height}`}>
+        {yTicks.map((tick, index) => (
+          <g key={index}>
+            <line
+              x1={paddingLeft}
+              x2={width - paddingRight}
+              y1={tick.y}
+              y2={tick.y}
+              stroke="rgba(255,255,255,.08)"
+            />
+            <text
+              x={12}
+              y={tick.y + 4}
+              fill="rgba(255,255,255,.55)"
+              fontSize="12"
+            >
+              {tick.value.toFixed(0)}%
+            </text>
+          </g>
+        ))}
+
         <line
-          x1="0"
-          x2={width}
-          y1={zeroY}
-          y2={zeroY}
-          stroke="rgba(255,255,255,.12)"
-          strokeDasharray="6 6"
+          x1={paddingLeft}
+          x2={width - paddingRight}
+          y1={baselineY}
+          y2={baselineY}
+          stroke="rgba(255,255,255,.18)"
+          strokeWidth="1.5"
         />
 
-        {/* area */}
-        <path
-          d={area}
-          fill="rgba(74, 222, 128, .12)"
-        />
+        <path d={area} fill="rgba(74, 222, 128, .22)" />
 
-        {/* line */}
         <path
           d={line}
           fill="none"
           stroke="rgb(74, 222, 128)"
-          strokeWidth="4"
+          strokeWidth="3.5"
           strokeLinecap="round"
+          strokeLinejoin="round"
         />
 
-        {/* hover zones */}
         {coords.map((p, index) => (
-          <g
+          <circle
             key={index}
-            onMouseEnter={() => setHovered(index)}
-          >
-            <rect
-              x={p.x - width / coords.length / 2}
-              y={0}
-              width={width / coords.length}
-              height={height}
-              fill="transparent"
-            />
-          </g>
+            cx={p.x}
+            cy={p.y}
+            r="3.5"
+            fill="rgb(74, 222, 128)"
+          />
         ))}
 
-        {/* hover line */}
-        {hoveredPoint && (
-          <>
-            <line
-              x1={hoveredPoint.x}
-              x2={hoveredPoint.x}
-              y1={0}
-              y2={height}
-              stroke="rgba(255,255,255,.25)"
-              strokeDasharray="5 5"
-            />
+        {monthLabels.map((p, index) => {
+          const coord = coords.find((c) => c.date === p.date);
+          if (!coord) return null;
 
-            <circle
-              cx={hoveredPoint.x}
-              cy={hoveredPoint.y}
-              r="6"
-              fill="rgb(74, 222, 128)"
-            />
-
-          </>
-        )}
-        </svg>
-        {hoveredPoint && (
-  <div
-    className="chartTooltip"
-    style={{
-      left: `${(hoveredPoint.x / width) * 100}%`,
-      top: `${(hoveredPoint.y / height) * 100}%`,
-    }}
-  >
-    <b>{hoveredPoint.value.toFixed(2)}%</b>
-    <span>{hoveredPoint.date}</span>
-  </div>
-)}
-</div>
-
-      <div className="chartLabels">
-        <span>
-          {hoveredPoint
-            ? hoveredPoint.date
-            : points[0]?.date}
-        </span>
-
-        <span>
-          {max.toFixed(0)}%
-        </span>
-      </div>
+          return (
+            <text
+              key={index}
+              x={coord.x}
+              y={height - 8}
+              textAnchor="middle"
+              fill="rgba(255,255,255,.55)"
+              fontSize="12"
+            >
+              {new Date(p.date).toLocaleDateString('en-US', {
+                month: 'short',
+                year: '2-digit',
+              })}
+            </text>
+          );
+        })}
+      </svg>
     </div>
   );
 }
