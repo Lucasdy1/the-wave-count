@@ -426,9 +426,6 @@ useEffect(() => {
   }
 };
 
-  loadSnapshots();
-}, []);
-
 useEffect(() => {
   if (!positions.length) return;
 
