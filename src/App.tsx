@@ -526,6 +526,7 @@ useEffect(() => {
 
 useEffect(() => {
   if (!positions.length) return;
+  if (!positions.some((p) => p.current && p.current > 0)) return;
 
   refreshPrices(positions);
 
