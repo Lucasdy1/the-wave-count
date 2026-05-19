@@ -284,3 +284,27 @@ td:last-child {
 .chartInner svg {
   pointer-events: none;
 }
+
+.chartTooltip {
+  position: absolute;
+  transform: translate(12px, -110%);
+  background: rgba(8, 20, 18, 0.92);
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 12px;
+  padding: 8px 10px;
+  color: white;
+  font-size: 13px;
+  pointer-events: none;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+.chartTooltip b {
+  display: block;
+  font-size: 15px;
+}
+
+.chartTooltip span {
+  opacity: .7;
+}
