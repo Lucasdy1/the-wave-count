@@ -515,7 +515,7 @@ useEffect(() => {
   const { data, error } = await supabase
     .from('portfolio_snapshots')
     .select('*')
-    .order('created_at', { ascending: true });
+    .order('date', { ascending: true });
 
   if (!error && data) {
     setSnapshots(
