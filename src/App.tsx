@@ -718,6 +718,19 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
           </div>
         </section>
 
+        <section className="allocationSection">
+  <div className="panel allocationPanel">
+    <div className="allocationHeader">
+      <div>
+        <h2>Portfolio Performance</h2>
+        <p>Total portfolio return over time</p>
+      </div>
+    </div>
+
+    <PortfolioChart snapshots={snapshots} />
+  </div>
+</section>
+
         <section className="panel positions">
           <div className="panelHead">
             <div>
