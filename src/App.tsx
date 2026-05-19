@@ -313,6 +313,48 @@ function Donut({ groups }: { groups: GroupedPosition[] }) {
   );
 }
 
+function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
+  if (!snapshots.length) {
+    return <div className="empty">No portfolio history yet.</div>;
+  }
+
+  const points = snapshots.map((s) => ({
+    date: s.date,
+    value: s.totalReturn,
+  }));
+
+  const min = Math.min(0, ...points.map((p) => p.value));
+  const max = Math.max(1, ...points.map((p) => p.value));
+  const width = 700;
+  const height = 240;
+
+  const coords = points.map((p, index) => {
+    const x = points.length === 1 ? 0 : (index / (points.length - 1)) * width;
+    const y = height - ((p.value - min) / (max - min || 1)) * height;
+    return { ...p, x, y };
+  });
+
+  const line = coords
+    .map((p, index) => `${index === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
+    .join(' ');
+
+  const area = `${line} L ${width} ${height} L 0 ${height} Z`;
+
+  return (
+    <div className="chart">
+      <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+        <line x1="0" x2={width} y1={height / 2} y2={height / 2} stroke="rgba(255,255,255,.10)" />
+        <path d={area} fill="rgba(74, 222, 128, .12)" />
+        <path d={line} fill="none" stroke="rgb(74, 222, 128)" strokeWidth="4" />
+      </svg>
+      <div className="chartLabels">
+        <span>{points[0]?.date}</span>
+        <span>{points[points.length - 1]?.date}</span>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const [positions, setPositions] = useState<Position[]>([]);
   const [tab, setTab] = useState<'open' | 'closed'>('open');
