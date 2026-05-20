@@ -318,31 +318,44 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
     return <div className="empty">No portfolio history yet.</div>;
   }
 
-  const points = [...snapshots]
+  const realPoints = [...snapshots]
     .sort((a, b) => a.date.localeCompare(b.date))
     .map((s) => ({
       date: s.date,
       value: s.totalReturn,
     }));
 
-  const min = Math.min(0, ...points.map((p) => p.value));
-  const max = Math.max(10, ...points.map((p) => p.value));
+  const firstDate = new Date(realPoints[0].date);
+  firstDate.setDate(firstDate.getDate() - 1);
 
-  const width = 850;
-  const height = 320;
-  const paddingLeft = 24;
-  const paddingRight = 4;
-  const paddingTop = 24;
-  const paddingBottom = 34;
+  const points =
+    realPoints.length === 1
+      ? [
+          {
+            date: firstDate.toISOString().split('T')[0],
+            value: 0,
+          },
+          realPoints[0],
+        ]
+      : realPoints;
+
+  const min = Math.min(-10, 0, ...points.map((p) => p.value));
+  const max = Math.max(30, ...points.map((p) => p.value));
+
+  const width = 900;
+  const height = 340;
+  const paddingLeft = 58;
+  const paddingRight = 42;
+  const paddingTop = 32;
+  const paddingBottom = 44;
 
   const chartWidth = width - paddingLeft - paddingRight;
   const chartHeight = height - paddingTop - paddingBottom;
 
   const coords = points.map((p, index) => {
     const x =
-      points.length === 1
-        ? paddingLeft + chartWidth / 2
-        : paddingLeft + (index / (points.length - 1)) * chartWidth;
+      paddingLeft +
+      (index / Math.max(points.length - 1, 1)) * chartWidth;
 
     const y =
       paddingTop +
@@ -356,80 +369,90 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
     .map((p, index) => `${index === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
     .join(' ');
 
-  const baselineY =
+  const zeroY =
     paddingTop +
     chartHeight -
     ((0 - min) / (max - min || 1)) * chartHeight;
 
-  const area = `${line} L ${coords[coords.length - 1].x} ${baselineY} L ${coords[0].x} ${baselineY} Z`;
+  const area = `${line} L ${coords[coords.length - 1].x} ${zeroY} L ${coords[0].x} ${zeroY} Z`;
 
-  const yTicks = [50, 40, 30, 20, 10, 0].map((value) => {
-  const y =
-    paddingTop +
-    chartHeight -
-    ((value - min) / (max - min || 1)) * chartHeight;
+  const yTicks = [30, 20, 10, 0, -10].map((value) => {
+    const y =
+      paddingTop +
+      chartHeight -
+      ((value - min) / (max - min || 1)) * chartHeight;
 
-  return { value, y };
-});
+    return { value, y };
+  });
+
+  const last = coords[coords.length - 1];
 
   const monthLabels = points.filter((p, index, arr) => {
     if (index === 0 || index === arr.length - 1) return true;
-    const prev = arr[index - 1];
-    return p.date.slice(0, 7) !== prev.date.slice(0, 7);
+    return p.date.slice(0, 7) !== arr[index - 1].date.slice(0, 7);
   });
 
   return (
     <div className="chart cleanChart">
       <svg viewBox={`0 0 ${width} ${height}`}>
-        {yTicks.map((tick, index) => (
-          <g key={index}>
+        {yTicks.map((tick) => (
+          <g key={tick.value}>
             <line
               x1={paddingLeft}
               x2={width - paddingRight}
               y1={tick.y}
               y2={tick.y}
               stroke="rgba(255,255,255,.08)"
+              strokeDasharray={tick.value === 0 ? '0' : '6 8'}
             />
             <text
-              x={12}
-              y={tick.y + 4}
+              x={14}
+              y={tick.y + 5}
               fill="rgba(255,255,255,.55)"
-              fontSize="12"
+              fontSize="13"
             >
-              {tick.value.toFixed(0)}%
+              {tick.value}%
             </text>
           </g>
         ))}
 
-        <line
-          x1={paddingLeft}
-          x2={width - paddingRight}
-          y1={baselineY}
-          y2={baselineY}
-          stroke="rgba(255,255,255,.18)"
-          strokeWidth="1.5"
-        />
-
-        <path d={area} fill="rgba(74, 222, 128, .22)" />
+        <path d={area} fill="rgba(74, 222, 128, .20)" />
 
         <path
           d={line}
           fill="none"
           stroke="rgb(74, 222, 128)"
-          strokeWidth="3.5"
+          strokeWidth="4"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
 
-        {coords.map((p, index) => (
-          <circle
-            key={index}
-            cx={p.x}
-            cy={p.y}
-            r="3.5"
-            fill="rgb(74, 222, 128)"
+        <circle cx={coords[0].x} cy={coords[0].y} r="4" fill="rgb(74, 222, 128)" />
+        <circle cx={last.x} cy={last.y} r="5" fill="rgb(74, 222, 128)" />
+
+        <line
+          x1={last.x}
+          x2={last.x}
+          y1={last.y}
+          y2={zeroY}
+          stroke="rgba(74, 222, 128, .25)"
+        />
+
+        <g transform={`translate(${Math.min(last.x - 92, width - 190)}, ${Math.max(last.y - 76, 22)})`}>
+          <rect
+            width="160"
+            height="62"
+            rx="10"
+            fill="rgba(8, 20, 18, .88)"
+            stroke="rgba(255,255,255,.14)"
           />
-        ))}
+          <text x="14" y="24" fill="rgba(255,255,255,.72)" fontSize="13">
+            Total Return
+          </text>
+          <text x="14" y="48" fill="rgb(74, 222, 128)" fontSize="17" fontWeight="700">
+            {last.value.toFixed(2)}%
+          </text>
+        </g>
 
         {monthLabels.map((p, index) => {
           const coord = coords.find((c) => c.date === p.date);
@@ -439,10 +462,10 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
             <text
               key={index}
               x={coord.x}
-              y={height - 8}
+              y={height - 10}
               textAnchor="middle"
               fill="rgba(255,255,255,.55)"
-              fontSize="12"
+              fontSize="13"
             >
               {new Date(p.date).toLocaleDateString('en-US', {
                 month: 'short',
