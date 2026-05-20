@@ -414,7 +414,7 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
           <text x="14" y="25" fill="rgba(255,255,255,.72)" fontSize="14">
             {lastDate}
           </text>
-          <text x="16" y="58" fill="rgb(74, 222, 128)" fontSize="22" fontWeight="800">
+          <text x="14" y="50" fill="rgb(74, 222, 128)" fontSize="19" fontWeight="800">
             +{last.value.toFixed(2)}%
           </text>
         </g>
