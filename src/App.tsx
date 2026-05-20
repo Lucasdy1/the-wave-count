@@ -480,7 +480,7 @@ export default function Dashboard() {
   }
 
   async function refreshPrices(currentPositions = positions) {
-    const symbols = Array.from(new Set(currentPositions.map((p) => p.asset)));
+    const symbols = Array.from(new Set(currentPositions.map((p) => p.asset.toUpperCase())));
     const updates: Record<string, number | null> = {};
 
     for (const symbol of symbols) {
