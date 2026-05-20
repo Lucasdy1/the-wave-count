@@ -488,7 +488,7 @@ export default function Dashboard() {
     }
 
     const changed = currentPositions.map((p) => {
-      const price = updates[p.asset];
+      const price = updates[p.asset.toUpperCase()];
       return price ? { ...p, current: price, lastUpdated: new Date().toISOString() } : p;
     });
 
