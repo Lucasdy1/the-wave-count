@@ -590,6 +590,7 @@ useEffect(() => {
 
   useEffect(() => {
   if (!positions.length) return;
+  if (!positions.some((p) => p.current && p.current > 0)) return;
 
   const saveSnapshot = async () => {
     const today = new Date().toISOString().split('T')[0];
