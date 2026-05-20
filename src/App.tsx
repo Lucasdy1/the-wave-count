@@ -403,7 +403,7 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
           </text>
         </g>
 
-        <g transform={`translate(${width - 220}, 52)`}>
+        <g transform={`translate(${last.x - 80}, ${Math.max(last.y - 95, 48)})`}>
           <rect
             width="170"
             height="76"
