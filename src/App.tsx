@@ -336,7 +336,7 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
   const width = 1000;
   const height = 360;
   const paddingLeft = 58;
-  const paddingRight = 35;
+  const paddingRight = 20;
   const paddingTop = 50;
   const paddingBottom = 50;
 
