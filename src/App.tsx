@@ -330,33 +330,24 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
 
   const points =
     realPoints.length === 1
-      ? [
-          {
-            date: firstDate.toISOString().split('T')[0],
-            value: 0,
-          },
-          realPoints[0],
-        ]
+      ? [{ date: firstDate.toISOString().split('T')[0], value: 0 }, realPoints[0]]
       : realPoints;
 
-  const min = Math.min(-10, 0, ...points.map((p) => p.value));
+  const min = Math.min(0, ...points.map((p) => p.value));
   const max = Math.max(30, ...points.map((p) => p.value));
 
   const width = 900;
-  const height = 340;
-  const paddingLeft = 58;
-  const paddingRight = 42;
-  const paddingTop = 32;
-  const paddingBottom = 44;
+  const height = 360;
+  const paddingLeft = 54;
+  const paddingRight = 120;
+  const paddingTop = 48;
+  const paddingBottom = 48;
 
   const chartWidth = width - paddingLeft - paddingRight;
   const chartHeight = height - paddingTop - paddingBottom;
 
   const coords = points.map((p, index) => {
-    const x =
-      paddingLeft +
-      (index / Math.max(points.length - 1, 1)) * chartWidth;
-
+    const x = paddingLeft + (index / Math.max(points.length - 1, 1)) * chartWidth;
     const y =
       paddingTop +
       chartHeight -
@@ -376,7 +367,7 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
 
   const area = `${line} L ${coords[coords.length - 1].x} ${zeroY} L ${coords[0].x} ${zeroY} Z`;
 
-  const yTicks = [30, 20, 10, 0, -10].map((value) => {
+  const yTicks = [30, 20, 10, 0].map((value) => {
     const y =
       paddingTop +
       chartHeight -
@@ -386,15 +377,48 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
   });
 
   const last = coords[coords.length - 1];
+  const lastDate = new Date(last.date).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 
-  const monthLabels = points.filter((p, index, arr) => {
-    if (index === 0 || index === arr.length - 1) return true;
-    return p.date.slice(0, 7) !== arr[index - 1].date.slice(0, 7);
+  const startLabel = new Date(points[0].date).toLocaleDateString('en-US', {
+    month: 'short',
+    year: '2-digit',
+  });
+
+  const endLabel = new Date(points[points.length - 1].date).toLocaleDateString('en-US', {
+    month: 'short',
+    year: '2-digit',
   });
 
   return (
     <div className="chart cleanChart">
       <svg viewBox={`0 0 ${width} ${height}`}>
+        <g>
+          <circle cx={width - 205} cy="24" r="5" fill="rgb(74, 222, 128)" />
+          <text x={width - 190} y="29" fill="rgba(255,255,255,.86)" fontSize="16" fontWeight="600">
+            Total Return
+          </text>
+        </g>
+
+        <g transform={`translate(${width - 220}, 52)`}>
+          <rect
+            width="170"
+            height="76"
+            rx="12"
+            fill="rgba(8, 20, 18, .72)"
+            stroke="rgba(255,255,255,.18)"
+          />
+          <text x="16" y="30" fill="rgba(255,255,255,.72)" fontSize="16">
+            {lastDate}
+          </text>
+          <text x="16" y="58" fill="rgb(74, 222, 128)" fontSize="22" fontWeight="800">
+            +{last.value.toFixed(2)}%
+          </text>
+        </g>
+
         {yTicks.map((tick) => (
           <g key={tick.value}>
             <line
@@ -402,21 +426,21 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
               x2={width - paddingRight}
               y1={tick.y}
               y2={tick.y}
-              stroke="rgba(255,255,255,.08)"
+              stroke="rgba(255,255,255,.12)"
               strokeDasharray={tick.value === 0 ? '0' : '6 8'}
             />
             <text
-              x={14}
+              x={12}
               y={tick.y + 5}
-              fill="rgba(255,255,255,.55)"
-              fontSize="13"
+              fill="rgba(255,255,255,.72)"
+              fontSize="15"
             >
               {tick.value}%
             </text>
           </g>
         ))}
 
-        <path d={area} fill="rgba(74, 222, 128, .20)" />
+        <path d={area} fill="rgba(74, 222, 128, .22)" />
 
         <path
           d={line}
@@ -427,53 +451,38 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
           strokeLinejoin="round"
         />
 
-        <circle cx={coords[0].x} cy={coords[0].y} r="4" fill="rgb(74, 222, 128)" />
-        <circle cx={last.x} cy={last.y} r="5" fill="rgb(74, 222, 128)" />
-
         <line
           x1={last.x}
           x2={last.x}
           y1={last.y}
           y2={zeroY}
-          stroke="rgba(74, 222, 128, .25)"
+          stroke="rgba(74, 222, 128, .38)"
         />
 
-        <g transform={`translate(${Math.min(last.x - 92, width - 190)}, ${Math.max(last.y - 76, 22)})`}>
-          <rect
-            width="160"
-            height="62"
-            rx="10"
-            fill="rgba(8, 20, 18, .88)"
-            stroke="rgba(255,255,255,.14)"
-          />
-          <text x="14" y="24" fill="rgba(255,255,255,.72)" fontSize="13">
-            Total Return
-          </text>
-          <text x="14" y="48" fill="rgb(74, 222, 128)" fontSize="17" fontWeight="700">
-            {last.value.toFixed(2)}%
-          </text>
-        </g>
+        <circle cx={coords[0].x} cy={coords[0].y} r="5" fill="rgb(74, 222, 128)" />
+        <circle cx={last.x} cy={last.y} r="7" fill="rgb(74, 222, 128)" />
+        <circle cx={last.x} cy={last.y} r="15" fill="rgba(74, 222, 128, .18)" />
 
-        {monthLabels.map((p, index) => {
-          const coord = coords.find((c) => c.date === p.date);
-          if (!coord) return null;
+        <text
+          x={coords[0].x}
+          y={height - 14}
+          textAnchor="middle"
+          fill="rgba(255,255,255,.62)"
+          fontSize="15"
+        >
+          {startLabel}
+        </text>
 
-          return (
-            <text
-              key={index}
-              x={coord.x}
-              y={height - 10}
-              textAnchor="middle"
-              fill="rgba(255,255,255,.55)"
-              fontSize="13"
-            >
-              {new Date(p.date).toLocaleDateString('en-US', {
-                month: 'short',
-                year: '2-digit',
-              })}
-            </text>
-          );
-        })}
+        <text
+          x={last.x}
+          y={height - 14}
+          textAnchor="middle"
+          fill="rgb(74, 222, 128)"
+          fontSize="15"
+          fontWeight="700"
+        >
+          {endLabel}
+        </text>
       </svg>
     </div>
   );
