@@ -320,10 +320,7 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
 
   const realPoints = [...snapshots]
     .sort((a, b) => a.date.localeCompare(b.date))
-    .map((s) => ({
-      date: s.date,
-      value: s.totalReturn,
-    }));
+    .map((s) => ({ date: s.date, value: s.totalReturn }));
 
   const firstDate = new Date(realPoints[0].date);
   firstDate.setDate(firstDate.getDate() - 1);
@@ -338,45 +335,32 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
 
   const width = 900;
   const height = 360;
-  const paddingLeft = 54;
-  const paddingRight = 90;
-  const paddingTop = 48;
-  const paddingBottom = 48;
+  const paddingLeft = 58;
+  const paddingRight = 95;
+  const paddingTop = 50;
+  const paddingBottom = 50;
 
   const chartWidth = width - paddingLeft - paddingRight;
   const chartHeight = height - paddingTop - paddingBottom;
 
   const coords = points.map((p, index) => {
     const x = paddingLeft + (index / Math.max(points.length - 1, 1)) * chartWidth;
-    const y =
-      paddingTop +
-      chartHeight -
-      ((p.value - min) / (max - min || 1)) * chartHeight;
-
+    const y = paddingTop + chartHeight - ((p.value - min) / (max - min || 1)) * chartHeight;
     return { ...p, x, y };
   });
 
-  const line = coords
-    .map((p, index) => `${index === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
-    .join(' ');
+  const line = coords.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
 
-  const zeroY =
-    paddingTop +
-    chartHeight -
-    ((0 - min) / (max - min || 1)) * chartHeight;
-
+  const zeroY = paddingTop + chartHeight - ((0 - min) / (max - min || 1)) * chartHeight;
   const area = `${line} L ${coords[coords.length - 1].x} ${zeroY} L ${coords[0].x} ${zeroY} Z`;
 
   const yTicks = [30, 20, 10, 0].map((value) => {
-    const y =
-      paddingTop +
-      chartHeight -
-      ((value - min) / (max - min || 1)) * chartHeight;
-
+    const y = paddingTop + chartHeight - ((value - min) / (max - min || 1)) * chartHeight;
     return { value, y };
   });
 
   const last = coords[coords.length - 1];
+
   const lastDate = new Date(last.date).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -393,29 +377,18 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
     year: '2-digit',
   });
 
+  const boxWidth = 150;
+  const boxHeight = 72;
+  const boxX = Math.min(Math.max(last.x - boxWidth / 2, paddingLeft), width - paddingRight - boxWidth);
+  const boxY = Math.max(last.y - boxHeight - 24, paddingTop + 4);
+
   return (
     <div className="chart cleanChart">
       <svg viewBox={`0 0 ${width} ${height}`}>
         <g>
-          <circle cx={width - 150} cy="24" r="5" fill="rgb(74, 222, 128)" />
-<text x={width - 135} y="29" fill="rgba(255,255,255,.86)" fontSize="16" fontWeight="600">
+          <circle cx={width - 178} cy="26" r="5" fill="rgb(74, 222, 128)" />
+          <text x={width - 162} y="31" fill="rgba(255,255,255,.9)" fontSize="16" fontWeight="700">
             Total Return
-          </text>
-        </g>
-
-        <g transform={`translate(${last.x - 80}, ${Math.max(last.y - 95, 48)})`}>
-          <rect
-            width="150"
-            height="64"
-            rx="12"
-            fill="rgba(8, 20, 18, .72)"
-            stroke="rgba(255,255,255,.18)"
-          />
-          <text x="14" y="25" fill="rgba(255,255,255,.72)" fontSize="14">
-            {lastDate}
-          </text>
-          <text x="14" y="50" fill="rgb(74, 222, 128)" fontSize="19" fontWeight="800">
-            +{last.value.toFixed(2)}%
           </text>
         </g>
 
@@ -429,12 +402,7 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
               stroke="rgba(255,255,255,.12)"
               strokeDasharray={tick.value === 0 ? '0' : '6 8'}
             />
-            <text
-              x={12}
-              y={tick.y + 5}
-              fill="rgba(255,255,255,.72)"
-              fontSize="15"
-            >
+            <text x={14} y={tick.y + 5} fill="rgba(255,255,255,.72)" fontSize="15">
               {tick.value}%
             </text>
           </g>
@@ -451,36 +419,33 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
           strokeLinejoin="round"
         />
 
-        <line
-          x1={last.x}
-          x2={last.x}
-          y1={last.y}
-          y2={zeroY}
-          stroke="rgba(74, 222, 128, .38)"
-        />
+        <line x1={last.x} x2={last.x} y1={last.y} y2={zeroY} stroke="rgba(74, 222, 128, .35)" />
 
         <circle cx={coords[0].x} cy={coords[0].y} r="5" fill="rgb(74, 222, 128)" />
         <circle cx={last.x} cy={last.y} r="7" fill="rgb(74, 222, 128)" />
-        <circle cx={last.x} cy={last.y} r="15" fill="rgba(74, 222, 128, .18)" />
+        <circle cx={last.x} cy={last.y} r="11" fill="rgba(74, 222, 128, .18)" />
 
-        <text
-          x={coords[0].x}
-          y={height - 14}
-          textAnchor="middle"
-          fill="rgba(255,255,255,.62)"
-          fontSize="15"
-        >
+        <g transform={`translate(${boxX}, ${boxY})`}>
+          <rect
+            width={boxWidth}
+            height={boxHeight}
+            rx="10"
+            fill="rgba(8, 20, 18, .9)"
+            stroke="rgba(255,255,255,.18)"
+          />
+          <text x="16" y="28" fill="rgba(255,255,255,.72)" fontSize="14">
+            {lastDate}
+          </text>
+          <text x="16" y="56" fill="rgb(74, 222, 128)" fontSize="21" fontWeight="800">
+            +{last.value.toFixed(2)}%
+          </text>
+        </g>
+
+        <text x={coords[0].x} y={height - 14} textAnchor="middle" fill="rgba(255,255,255,.62)" fontSize="15">
           {startLabel}
         </text>
 
-        <text
-          x={last.x}
-          y={height - 14}
-          textAnchor="middle"
-          fill="rgb(74, 222, 128)"
-          fontSize="15"
-          fontWeight="700"
-        >
+        <text x={last.x} y={height - 14} textAnchor="middle" fill="rgb(74, 222, 128)" fontSize="15" fontWeight="700">
           {endLabel}
         </text>
       </svg>
