@@ -386,8 +386,8 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
     <div className="chart cleanChart">
       <svg viewBox={`0 0 ${width} ${height}`}>
         <g>
-          <circle cx={width - 178} cy="26" r="5" fill="rgb(74, 222, 128)" />
-          <text x={width - 162} y="31" fill="rgba(255,255,255,.9)" fontSize="16" fontWeight="700">
+          <circle cx={width - 150} cy="26" r="5" fill="rgb(74, 222, 128)" />
+          <text x={width - 140} y="31" fill="rgba(255,255,255,.9)" fontSize="16" fontWeight="700">
             Total Return
           </text>
         </g>
