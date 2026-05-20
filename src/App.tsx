@@ -333,7 +333,7 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
   const min = Math.min(0, ...points.map((p) => p.value));
   const max = Math.max(30, ...points.map((p) => p.value));
 
-  const width = 900;
+  const width = 850;
   const height = 360;
   const paddingLeft = 58;
   const paddingRight = 95;
