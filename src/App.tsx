@@ -423,7 +423,7 @@ const yTicks = [topTick, topTick - tickStep, topTick - tickStep * 2, 0].map((val
               strokeDasharray={tick.value === 0 ? '0' : '6 8'}
             />
             <text x={14} y={tick.y + 5} fill="rgba(255,255,255,.72)" fontSize="15">
-              {tick.value}%
+              {Math.round(tick.value)}%
             </text>
           </g>
         ))}
