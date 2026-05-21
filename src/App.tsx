@@ -373,9 +373,10 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
   });
 
   const endLabel = new Date(points[points.length - 1].date).toLocaleDateString('en-US', {
-    month: 'short',
-    year: '2-digit',
-  });
+  day: 'numeric',
+  month: 'short',
+  year: '2-digit',
+});
 
   return (
     <div className="chart cleanChart">
