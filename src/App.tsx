@@ -313,7 +313,13 @@ function Donut({ groups }: { groups: GroupedPosition[] }) {
   );
 }
 
-function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
+function PortfolioChart({
+  snapshots,
+  currentTotalReturn,
+}: {
+  snapshots: PortfolioSnapshot[];
+  currentTotalReturn: number;
+}) {
   if (!snapshots.length) {
     return <div className="empty">No portfolio history yet.</div>;
   }
