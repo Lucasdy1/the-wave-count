@@ -324,9 +324,19 @@ function PortfolioChart({
     return <div className="empty">No portfolio history yet.</div>;
   }
 
-  const realPoints = [...snapshots]
+ const realPoints = [
+  ...snapshots
     .sort((a, b) => a.date.localeCompare(b.date))
-    .map((s) => ({ date: s.date, value: s.totalReturn }));
+    .map((s) => ({
+      date: s.date,
+      value: s.totalReturn,
+    })),
+
+  {
+    date: new Date().toISOString().split('T')[0],
+    value: currentTotalReturn,
+  },
+];
 
   const firstDate = new Date(realPoints[0].date);
   firstDate.setDate(firstDate.getDate() - 1);
