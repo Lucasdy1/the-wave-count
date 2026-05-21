@@ -379,7 +379,7 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
 
   const boxWidth = 110;
   const boxHeight = 50;
-  const boxX = Math.min(Math.max(last.x - boxWidth / 2, paddingLeft), width - paddingRight - boxWidth);
+  const boxX = Math.min(Math.max(last.x - boxWidth - 18, paddingLeft), width - paddingRight - boxWidth);
   const boxY = Math.max(last.y - boxHeight - 24, paddingTop + 4);
 
   return (
