@@ -829,7 +829,7 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
       </div>
     </div>
 
-    <PortfolioChart snapshots={snapshots} />
+    <PortfolioChart snapshots={snapshots} currentTotalReturn={avgReturn + closedAvg} />
   </div>
 </section>
 
