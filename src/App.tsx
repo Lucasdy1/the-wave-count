@@ -530,7 +530,7 @@ useEffect(() => {
   refreshPrices(positions);
 
   const interval = window.setInterval(() => {
-  saveSnapshot();
+  refreshPrices(positions);
 }, 60 * 60 * 1000);
 
   return () => window.clearInterval(interval);
