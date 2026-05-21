@@ -426,7 +426,7 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
           {startLabel}
         </text>
 
-        <text x={last.x} y={height - 14} textAnchor="middle" fill="rgb(74, 222, 128)" fontSize="15" fontWeight="700">
+        <text x={last.x - 14} y={height - 14} textAnchor="middle" fill="rgb(74, 222, 128)" fontSize="15" fontWeight="700">
           {endLabel}
         </text>
       </svg>
