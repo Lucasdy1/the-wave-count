@@ -620,7 +620,13 @@ useEffect(() => {
     }
   };
 
-  saveSnapshot();
+    saveSnapshot();
+
+  const interval = window.setInterval(() => {
+    saveSnapshot();
+  }, 2 * 60 * 60 * 1000);
+
+  return () => window.clearInterval(interval);
 }, [avgReturn, closedAvg, positions]);
 
   function requireAdmin() {
