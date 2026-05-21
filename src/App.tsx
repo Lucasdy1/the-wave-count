@@ -377,11 +377,6 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
     year: '2-digit',
   });
 
-  const boxWidth = 110;
-  const boxHeight = 50;
-  const boxX = Math.min(Math.max(last.x - boxWidth - 18, paddingLeft), width - paddingRight - boxWidth);
-  const boxY = Math.max(last.y - boxHeight - 24, paddingTop + 4);
-
   return (
     <div className="chart cleanChart">
       <svg viewBox={`0 0 ${width} ${height}`}>
