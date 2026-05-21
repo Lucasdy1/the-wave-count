@@ -370,8 +370,16 @@ function PortfolioChart({
   const zeroY = paddingTop + chartHeight - ((0 - min) / (max - min || 1)) * chartHeight;
   const area = `${line} L ${coords[coords.length - 1].x} ${zeroY} L ${coords[0].x} ${zeroY} Z`;
 
-  const yTicks = [30, 20, 10, 0].map((value) => {
-    const y = paddingTop + chartHeight - ((value - min) / (max - min || 1)) * chartHeight;
+  const topTick = Math.ceil(max / 10) * 10;
+
+const yTicks = [topTick, topTick - 10, topTick - 20, topTick - 30]
+  .filter((value) => value >= 0)
+  .map((value) => {
+    const y =
+      paddingTop +
+      chartHeight -
+      ((value - min) / (max - min || 1)) * chartHeight;
+
     return { value, y };
   });
 
