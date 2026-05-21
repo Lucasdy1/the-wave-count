@@ -531,7 +531,7 @@ useEffect(() => {
 
   const interval = window.setInterval(() => {
   saveSnapshot();
-}, 2 * 60 * 60 * 1000);
+}, 60 * 60 * 1000);
 
   return () => window.clearInterval(interval);
 }, [positions.length]);
