@@ -433,7 +433,7 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
             fill="rgba(8, 20, 18, .9)"
             stroke="rgba(255,255,255,.18)"
           />
-          <text x="16" y="28" fill="rgba(255,255,255,.72)" fontSize="10">
+          <text x="20" y="28" fill="rgba(255,255,255,.72)" fontSize="10">
             {lastDate}
           </text>
           <text x="16" y="56" fill="rgb(74, 222, 128)" fontSize="21" fontWeight="800">
