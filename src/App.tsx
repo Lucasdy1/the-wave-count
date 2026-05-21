@@ -378,27 +378,16 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
   year: '2-digit',
 });
 
-  return (
-  <div className="chart cleanChart">
-    <svg viewBox={`0 0 ${width} ${height}`}>
-      <g>
-        <circle
-          cx={width - 110}
-          cy="8"
-          r="5"
-          fill="rgb(74, 222, 128)"
-        />
+ return (
+  <>
+    <div className="chartLegend">
+      <span />
+      <b>Total Return</b>
+    </div>
 
-        <text
-          x={width - 94}
-          y="13"
-          fill="rgba(255,255,255,.92)"
-          fontSize="13"
-          fontWeight="600"
-        >
-          Total Return
-        </text>
-      </g>
+    <div className="chart cleanChart">
+      <svg viewBox={`0 0 ${width} ${height}`}>
+      
 
         {yTicks.map((tick) => (
           <g key={tick.value}>
@@ -441,8 +430,9 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
           {endLabel}
         </text>
       </svg>
-    </div>
-  );
+      </div>
+  </>
+);
 }
 
 export default function Dashboard() {
