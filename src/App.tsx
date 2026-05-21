@@ -420,22 +420,6 @@ function PortfolioChart({ snapshots }: { snapshots: PortfolioSnapshot[] }) {
         <circle cx={last.x} cy={last.y} r="7" fill="rgb(74, 222, 128)" />
         <circle cx={last.x} cy={last.y} r="11" fill="rgba(74, 222, 128, .18)" />
 
-        <g transform={`translate(${boxX}, ${boxY})`}>
-          <rect
-            width={boxWidth}
-            height={boxHeight}
-            rx="10"
-            fill="rgba(8, 20, 18, .9)"
-            stroke="rgba(255,255,255,.18)"
-          />
-          <text x="20" y="28" fill="rgba(255,255,255,.72)" fontSize="10">
-            {lastDate}
-          </text>
-          <text x="16" y="56" fill="rgb(74, 222, 128)" fontSize="19" fontWeight="800">
-            +{last.value.toFixed(2)}%
-          </text>
-        </g>
-
         <text x={coords[0].x} y={height - 14} textAnchor="middle" fill="rgba(255,255,255,.62)" fontSize="15">
           {startLabel}
         </text>
