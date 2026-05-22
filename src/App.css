@@ -315,7 +315,7 @@ td:last-child {
   display: block;
 }
 .positionsScroll {
-  max-height: 390px;
+  max-height: 380px;
   overflow-y: auto;
   padding-right: 6px;
 }
