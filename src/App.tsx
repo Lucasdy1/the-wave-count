@@ -858,7 +858,9 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
             </div>
           </div>
 
+          <div className="positionsScroll">
           <table>
+            </div>
             <thead>
               <tr>
                 <th>Asset</th>
