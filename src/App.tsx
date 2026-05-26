@@ -118,6 +118,8 @@ function fromDb(row: DbPosition): Position {
     entryDate: row.entry_date,
     status: row.status,
     current: row.current,
+    exitPrice: row.exit_price,
+closedDate: row.closed_date,
     lastUpdated: row.last_updated,
 
     weight: row.weight,
