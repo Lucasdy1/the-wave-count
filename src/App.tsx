@@ -876,7 +876,8 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
                 <th>Direction</th>
                 <th>First Entry</th>
                 <th>Avg Entry</th>
-                <th>Current</th>
+                <th>{tab === 'closed' ? 'Exit Price' : 'Current'}</th>
+<th>{tab === 'closed' ? 'Closed Date' : ''}</th>
                 <th>Perf.</th>
               </tr>
             </thead>
