@@ -901,8 +901,8 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
                       <td>{money.format(group.avgEntry)}</td>
                       <td>
   {tab === 'closed'
-    ? group.exitPrice
-      ? money.format(group.exitPrice)
+    ? group.entries[0]?.exitPrice
+      ? money.format(group.entries[0].exitPrice)
       : '-'
     : group.current
       ? money.format(group.current)
@@ -911,7 +911,7 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
 
 <td>
   {tab === 'closed'
-    ? group.closedDate ?? '-'
+    ? group.entries[0]?.closedDate ?? '-'
     : ''}
 </td>
                       <td className={group.perf >= 0 ? 'green' : 'red'}>{pct(group.perf)}</td>
