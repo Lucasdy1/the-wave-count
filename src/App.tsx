@@ -687,6 +687,8 @@ useEffect(() => {
       entryDate: form.entryDate,
       status: oldPosition?.status ?? 'open',
       current: oldPosition?.current ?? null,
+      exitPrice: null,
+closedDate: null,
       lastUpdated: oldPosition?.lastUpdated ?? null,
 
       weight: oldPosition?.weight ?? 100,
