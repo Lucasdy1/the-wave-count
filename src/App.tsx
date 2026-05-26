@@ -28,6 +28,8 @@ type DbPosition = {
   status: 'open' | 'closed';
   current: number | null;
   last_updated: string | null;
+  exit_price: number | null;
+closed_date: string | null;
 
   weight: number;
 remaining_weight: number;
