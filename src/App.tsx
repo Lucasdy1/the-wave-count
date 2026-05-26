@@ -937,7 +937,21 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
       <td>{entry.direction}</td>
       <td>{entry.entryDate}</td>
       <td>{money.format(entry.avgEntry)}</td>
-      <td>{entry.current ? money.format(entry.current) : 'Waiting for API'}</td>
+      <td>
+  {entry.status === 'closed'
+    ? entry.exitPrice
+      ? money.format(entry.exitPrice)
+      : '-'
+    : entry.current
+      ? money.format(entry.current)
+      : 'Waiting for API'}
+</td>
+
+<td>
+  {entry.status === 'closed'
+    ? entry.closedDate ?? '-'
+    : ''}
+</td>
       <td className={entryPerf >= 0 ? 'green' : 'red'}>{pct(entryPerf)}</td>
     </tr>
   );
