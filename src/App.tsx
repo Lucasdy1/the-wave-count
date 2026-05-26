@@ -11,6 +11,8 @@ type Position = {
   status: 'open' | 'closed';
   current: number | null;
   lastUpdated: string | null;
+  exitPrice: number | null;
+closedDate: string | null;
 
   weight: number;
 remainingWeight: number;
