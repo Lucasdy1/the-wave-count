@@ -899,7 +899,21 @@ realizedReturn: oldPosition?.realizedReturn ?? 0,
                       <td>{group.direction}</td>
                       <td>{group.firstEntryDate}</td>
                       <td>{money.format(group.avgEntry)}</td>
-                      <td>{group.current ? money.format(group.current) : 'Waiting for API'}</td>
+                      <td>
+  {tab === 'closed'
+    ? group.exitPrice
+      ? money.format(group.exitPrice)
+      : '-'
+    : group.current
+      ? money.format(group.current)
+      : 'Waiting for API'}
+</td>
+
+<td>
+  {tab === 'closed'
+    ? group.closedDate ?? '-'
+    : ''}
+</td>
                       <td className={group.perf >= 0 ? 'green' : 'red'}>{pct(group.perf)}</td>
                     </tr>
 
